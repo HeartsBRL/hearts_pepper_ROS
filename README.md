@@ -1,4 +1,4 @@
-# hearts_pepper_ROS
+# hearts_pepper_ros
 2019/2020 Pepper development on ROS
 # Pepper Robot ROS Driver
 
