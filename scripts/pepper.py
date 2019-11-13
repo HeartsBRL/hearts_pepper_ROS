@@ -6,6 +6,7 @@ import json
 import time
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
+from gaze_msgs.msg import Face_detection
 
 import qi
 
@@ -14,7 +15,7 @@ from naoqi import ALProxy
 MOVE_ENABLED = False
 
 #robotIP = "pepper.local"
-robotIP = "10.2.0.111" #Stevey
+robotIP = "stevey.local" #Stevey
 PORT = 9559
 
 # Location of map file on pepper
@@ -89,7 +90,7 @@ class Pepper():
             self.localizationProxy = ALProxy("ALLocalization", self._robotIP, self._PORT)
 
             self.navigationProxy = ALProxy("ALNavigation", self._robotIP, self._PORT)
-
+            self.trackerProxy = ALProxy("ALTracker", self._robotIP, self._PORT) #Tutorial
             self.baProxy = ALProxy("ALBasicAwareness", self._robotIP, self._PORT)
 
             self.listeningProxy = ALProxy("ALListeningMovement", self._robotIP, self._PORT)
@@ -122,6 +123,27 @@ class Pepper():
 #
 #        rospy.loginfo("%s", data.data)
 #        self.listen(data.data)
+
+    def gaze_callback(self, data):
+        rospy.loginfo("%s", data.data)
+
+        if data.state:
+            # data.targetName = "Face"
+            # data.faceWidth = 0.1
+            self.trackerProxy.registerTarget(data.targetName, data.faceWidth)
+
+            # Then, start tracker.
+            self.trackerProxy.track(data.targetName)
+            print "ALTracker successfully started, now show your face to robot!"
+        elif data.state == False:
+            # Stop tracker.
+            self.trackerProxy.stopTracker()
+            self.trackerProxy.unregisterAllTargets()
+
+            print "ALTracker stopped."
+        else:
+            rospy.loginfo("Wrong state input")
+
 
     def display_callback(self, data):
 
@@ -278,35 +300,41 @@ class Pepper():
                 #http://doc.aldebaran.com/2-4/naoqi/interaction/dialog/aldialog-api.html#aldialog-api
                 if(data.data == "dialogoff"):
                     self.dialogProxy.stopDialog()
-                if(data.data == "dialogon"):
+                elif(data.data == "dialogon"):
                     self.dialogProxy.runDialog()
 
                 #http://doc.aldebaran.com/2-1/naoqi/core/autonomouslife_advanced.html#autonomouslife-disabled
-                if(data.data == "notalive"):
+                elif(data.data == "notalive"):
                     self.lifeProxy.setState("safeguard") #Disabled all functionalities. Floffy robot
-                if(data.data == "alive"):
+                elif(data.data == "alive"):
                     self.lifeProxy.setState("solitary") #Comes back into solitary mode and from there it goes to interactive (NEVER GO STRAIGHT)
-                if(data.data == "rest"):
-                    self.lifeProxy.setState("disabled") #Comes back into solitary mode and from there it goes to interactive (NEVER GO STRAIGHT)
-                if(data.data == "engage"):
+                elif(data.data == "disable"):
+                    self.lifeProxy.setState("disabled") #
+                elif(data.data == "engage"):
                     #self.baProxy.startAwareness()
                     self.baProxy.setEnabled(True)
                     self.listeningProxy.setEnabled(True)
-                if(data.data == "disengage"):
+                elif(data.data == "disengage"):
                     self.baProxy.setEnabled(False)
                     #self.baProxy.pauseAwareness()
                     self.listeningProxy.setEnabled(False)
-                if(data.data == "hearingoff"):
+                elif(data.data == "hearingoff"):
                     #self.baProxy.startAwareness()
                     #self.baProxy.setEnabled(True)
                     self.speech.removeAllContext()
                     self.listeningProxy.setEnabled(False)
-                if(data.data == "pause"):
+                elif(data.data == "pause"):
                     self.baProxy.pauseAwareness()
-                if(data.data == "resume"):
+                elif(data.data == "resume"):
                     self.baProxy.resumeAwareness()
-                if(data.data == "shutdown"):
+                elif(data.data == "shutdown"):
                     self.system.shutdown()
+                elif(data.data == "rest"):
+                    self.motionProxy.rest()
+                elif(data.data == "wakeUp"):
+                    self.motionProxy.wakeUp()
+                else:
+                    rospy.loginfo("Function not set up yet. Try another one")
         except:
                 print "error"
 
@@ -319,6 +347,7 @@ class Pepper():
         rospy.Subscriber("pepper/nav", String, self.nav_callback)
         rospy.Subscriber("pepper/go", String, self.go_callback)
         rospy.Subscriber("/cmd_vel_mux/input/teleop", Twist, self.twist_callback)
+        rospy.Subscriber("pepper/gaze", Face_detection, self.gaze_callback)
 
         rate = rospy.Rate(0.1)
         while not rospy.is_shutdown():
