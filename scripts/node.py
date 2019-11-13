@@ -3,6 +3,7 @@
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Int32
+from hearts_msgs.msg import Face_detection
 
 
 class NodeExample():
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     # initialization of the ros node
     rospy.init_node("nodeexample", anonymous=True)
 
-    n = Node()
+    n = NodeExample()
     n.example_function()
 
     rospy.spin()
