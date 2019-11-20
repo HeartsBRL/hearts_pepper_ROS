@@ -3,7 +3,7 @@
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Int32
-from hearts_msgs.msg import Face_detection
+import gaze_msgs.msg
 
 
 class NodeExample():
@@ -13,8 +13,8 @@ class NodeExample():
 
         # Set up a publisher called "publish", for an int
         self.pub = rospy.Publisher(
-                "publish",
-                Int32,
+                "pepper/gaze",
+                gaze_msgs.msg.face_detection,
                 queue_size=1)
 
         # Set up a subscriber called "subscribe" as a String
@@ -25,17 +25,18 @@ class NodeExample():
 
     def example_function(self):
 
-        val = 0
+        val = gaze_msgs.msg.face_detection()
         rate = rospy.Rate(1) # update rate of 1hz
-
+        val.state = True
+        val.targetName = "Face"
+        val.faceWidth = 0.1
         while not rospy.is_shutdown():
 
             rospy.loginfo("publishing value: " + str(val))
             # publish the value val to the topic
             self.pub.publish(val)
 
-            val = val + 1
-            # sleep the amount of time needed to achieve the 1hz rate set above
+                        # sleep the amount of time needed to achieve the 1hz rate set above
             rate.sleep()
 
 
