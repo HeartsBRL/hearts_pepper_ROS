@@ -6,7 +6,7 @@ import json
 import time
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
-from gaze_msgs.msg import Face_detection
+import gaze_msgs.msg
 
 import qi
 
@@ -347,7 +347,7 @@ class Pepper():
         rospy.Subscriber("pepper/nav", String, self.nav_callback)
         rospy.Subscriber("pepper/go", String, self.go_callback)
         rospy.Subscriber("/cmd_vel_mux/input/teleop", Twist, self.twist_callback)
-        rospy.Subscriber("pepper/gaze", Face_detection, self.gaze_callback)
+        rospy.Subscriber("pepper/gaze", gaze_msgs.msg.face_detection, self.gaze_callback)
 
         rate = rospy.Rate(0.1)
         while not rospy.is_shutdown():
