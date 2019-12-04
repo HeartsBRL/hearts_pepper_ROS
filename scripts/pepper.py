@@ -126,7 +126,6 @@ class Pepper():
 
     def gaze_callback(self, data):
         rospy.loginfo("%s", data.state)
-        self.say("I received the data")
         print "I am in"
         print data.state
         if data.state:

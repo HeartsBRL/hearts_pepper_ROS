@@ -23,6 +23,11 @@ class NodeExample():
                 String,
                 self.callback)
 
+        rate = rospy.Rate(2)
+        #Wait until the connections are stablished
+        while self.pub.get_num_connections() == 0:
+            rate.sleep() #sleep for 500ms
+
     def example_function(self):
 
         # val = gaze_msgs.msg.face_detection()
@@ -35,8 +40,10 @@ class NodeExample():
         rospy.loginfo("publishing value: " + str(self.val))
         # publish the value val to the topic
         self.pub.publish(self.val)
+        # rate.sleep()
+        # self.pub.publish(self.val)
 
-                        # sleep the amount of time needed to achieve the 1hz rate set above
+                            # sleep the amount of time needed to achieve the 1hz rate set above
             # rate.sleep()
 
 
@@ -53,8 +60,8 @@ if __name__ == '__main__':
 
     n = NodeExample()
     NodeExample.val = gaze_msgs.msg.face_detection()
-
-    NodeExample.val.state = True
+    #Change to True or False depending on activation pr desactivation preference
+    NodeExample.val.state = False
     NodeExample.val.targetName = "Face"
     NodeExample.val.faceWidth = 0.1
     n.example_function()
