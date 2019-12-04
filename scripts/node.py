@@ -25,19 +25,19 @@ class NodeExample():
 
     def example_function(self):
 
-        val = gaze_msgs.msg.face_detection()
+        # val = gaze_msgs.msg.face_detection()
         rate = rospy.Rate(1) # update rate of 1hz
-        val.state = True
-        val.targetName = "Face"
-        val.faceWidth = 0.1
-        while not rospy.is_shutdown():
+        # val.state = True
+        # val.targetName = "Face"
+        # val.faceWidth = 0.1
+        # while not rospy.is_shutdown():
 
-            rospy.loginfo("publishing value: " + str(val))
-            # publish the value val to the topic
-            self.pub.publish(val)
+        rospy.loginfo("publishing value: " + str(self.val))
+        # publish the value val to the topic
+        self.pub.publish(self.val)
 
                         # sleep the amount of time needed to achieve the 1hz rate set above
-            rate.sleep()
+            # rate.sleep()
 
 
     def callback(self, data):
@@ -52,6 +52,12 @@ if __name__ == '__main__':
     rospy.init_node("nodeexample", anonymous=True)
 
     n = NodeExample()
+    NodeExample.val = gaze_msgs.msg.face_detection()
+
+    NodeExample.val.state = True
+    NodeExample.val.targetName = "Face"
+    NodeExample.val.faceWidth = 0.1
     n.example_function()
+
 
     rospy.spin()

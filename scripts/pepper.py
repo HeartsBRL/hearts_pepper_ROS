@@ -125,8 +125,10 @@ class Pepper():
 #        self.listen(data.data)
 
     def gaze_callback(self, data):
-        rospy.loginfo("%s", data.data)
-
+        rospy.loginfo("%s", data.state)
+        self.say("I received the data")
+        print "I am in"
+        print data.state
         if data.state:
             # data.targetName = "Face"
             # data.faceWidth = 0.1
